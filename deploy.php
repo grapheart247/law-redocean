@@ -112,7 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     elseif ($action === 'logout') {
         session_destroy();
-        header("Location: deploy.php");
+        // Redirecting to the main page as requested
+        header("Location: https://noorgee.pk/Law");
         exit;
     }
 }
@@ -154,7 +155,7 @@ $current_commit = get_commit_details($repo_path);
                 </button>
                 <form method="POST" class="inline">
                     <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="p-1.5 hover:text-red-400 transition text-slate-400" title="Logout">
+                    <button type="submit" class="p-1.5 hover:text-red-400 transition text-slate-400" title="Logout & Exit">
                         <i class="fa-solid fa-right-from-bracket text-xs"></i>
                     </button>
                 </form>
