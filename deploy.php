@@ -3,7 +3,7 @@
  * RedOcean Deployment Console (Compact Version)
  * ==========================================
  * Features: Deploy, Revert, Detailed Commit Info, Karachi Timezone.
- * Security: Session-based access (No long URL required after first login).
+ * Security: Password-based access ("123") with persistent sessions.
  */
 
 session_start();
@@ -16,22 +16,15 @@ date_default_timezone_set('Asia/Karachi');
 $repo_path  = '/home/noorgeec/repositories/law-redocean';
 $work_tree  = '/home/noorgeec/noorgee.pk/Law';
 $branch     = 'main-lw';
-$secret_key = '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'; // The Master Key
+$access_pass = '123'; // Your new simple password
 $github_url = 'https://github.com/grapheart247/law-redocean';
 
 // ==========================================
-// 2. ACCESS CONTROL (Auto-Session)
+// 2. ACCESS CONTROL
 // ==========================================
 
-// If key is provided in URL, save to session and redirect to clean URL
-if (isset($_GET['key']) && $_GET['key'] === $secret_key) {
-    $_SESSION['ro_authorized'] = true;
-    header("Location: deploy.php");
-    exit;
-}
-
 // Handle Login Form Submission
-if (isset($_POST['login_key']) && $_POST['login_key'] === $secret_key) {
+if (isset($_POST['login_pass']) && $_POST['login_pass'] === $access_pass) {
     $_SESSION['ro_authorized'] = true;
 }
 
@@ -41,25 +34,33 @@ if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>RedOcean | Auth Required</title>
+        <title>RedOcean | Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </head>
     <body class="bg-[#0f172a] h-screen flex items-center justify-center p-4">
-        <form method="POST" class="bg-[#161b22] p-8 rounded-xl border border-slate-800 shadow-2xl w-full max-w-md">
+        <form method="POST" class="bg-[#161b22] p-8 rounded-xl border border-slate-800 shadow-2xl w-full max-w-sm">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-lock text-green-400 text-2xl"></i>
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
+                    <i class="fa-solid fa-shield-halved text-green-400 text-2xl"></i>
                 </div>
-                <h2 class="text-white font-bold text-xl">Deployment Auth</h2>
-                <p class="text-slate-500 text-sm">Enter security key to access console</p>
+                <h2 class="text-white font-bold text-xl uppercase tracking-tight">RedOcean Login</h2>
+                <p class="text-slate-500 text-xs mt-1 italic">Enter '123' to manage Law Repo</p>
             </div>
-            <input type="password" name="login_key" placeholder="Enter GHP Key..." autofocus
-                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition">
-            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition">
-                Authorize Access
+            
+            <?php if(isset($_POST['login_pass'])): ?>
+                <div class="bg-red-900/20 border border-red-500/50 text-red-400 text-[10px] p-2 rounded mb-4 text-center">
+                    Incorrect password. Access Denied.
+                </div>
+            <?php endif; ?>
+
+            <input type="password" name="login_pass" placeholder="Password" autofocus
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition text-center tracking-widest">
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition uppercase text-sm tracking-widest">
+                Unlock Console
             </button>
         </form>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </body>
     </html>
     <?php
@@ -124,7 +125,7 @@ $current_commit = get_commit_details($repo_path);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedOcean | Compact Ops</title>
+    <title>RedOcean | Deployment Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -144,7 +145,7 @@ $current_commit = get_commit_details($repo_path);
         <div class="max-w-7xl mx-auto px-4 h-12 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-server text-green-400 text-sm"></i>
-                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.1</span></h1>
+                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.2</span></h1>
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest hidden md:inline">Karachi: <?php echo date('H:i:s'); ?></span>
@@ -187,7 +188,7 @@ $current_commit = get_commit_details($repo_path);
             <!-- Action Buttons (Row) -->
             <div class="md:col-span-4 flex flex-col gap-2">
                 <div class="grid grid-cols-2 gap-2">
-                    <form method="POST" onsubmit="return confirm('Deploy latest changes?');">
+                    <form method="POST" onsubmit="return confirm('Deploy latest changes from GitHub?');">
                         <input type="hidden" name="action" value="deploy">
                         <button type="submit" class="w-full h-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -246,8 +247,8 @@ $current_commit = get_commit_details($repo_path);
     </main>
 
     <footer class="bg-slate-100 border-t border-slate-200 px-4 py-1 flex justify-between items-center text-[9px] text-slate-400">
-        <p>Repo: <?php echo $repo_path; ?></p>
-        <p>&copy; RedOcean Services - Session Active</p>
+        <p>Path: <?php echo $work_tree; ?></p>
+        <p>&copy; RedOcean Services - Secure Console</p>
     </footer>
 
 </body>
