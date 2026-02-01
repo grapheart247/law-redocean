@@ -48,7 +48,7 @@ if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
                     <i class="fa-solid fa-shield-halved text-green-400 text-2xl"></i>
                 </div>
                 <h2 class="text-white font-bold text-xl uppercase tracking-tight">RedOcean Login</h2>
-                <p class="text-slate-500 text-xs mt-1 italic">Enter '123' to manage Law Repo</p>
+                <p class="text-slate-500 text-xs mt-1 italic">Enter 'pass' to manage Law Repo</p>
             </div>
             <input type="password" name="login_pass" placeholder="Password" autofocus
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition text-center tracking-widest">
@@ -146,7 +146,7 @@ $logs = $_SESSION['last_logs'] ?? [];
 unset($_SESSION['last_logs']);
 
 function get_commit_details($path) {
-    $cmd = "git -C $path log -1 --format='Hash: %h%nAuthor: %an%nDate: %ci%nSubject: %s%nDescription: %b'";
+    $cmd = "git -C $path log -1 --format='Hash: %h%nAuthor: %an%nDate: %ci%nCommit message: %s%nExtended description: %b'";
     $res = @shell_exec($cmd);
     return $res ? htmlspecialchars($res) : "No commit data found.";
 }
@@ -419,3 +419,4 @@ $current_commit = get_commit_details($repo_path);
 
 </body>
 </html>
+
