@@ -79,6 +79,38 @@ function execute_command($cmd, $title) {
     ];
 }
 
+/**
+ * Helper to calculate time elapsed from a date string
+ */
+function time_elapsed_string($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? null;
     $temp_logs = [];
@@ -196,7 +228,16 @@ $current_commit = get_commit_details($repo_path);
                         <?php 
                         $lines = explode("\n", $current_commit);
                         foreach($lines as $line) {
-                            if(trim($line)) echo "<span>" . $line . "</span>";
+                            if(trim($line)) {
+                                $displayLine = $line;
+                                // Add relative time to the Date line
+                                if (strpos($line, 'Date:') === 0) {
+                                    $dateVal = trim(str_replace('Date:', '', $line));
+                                    $ago = time_elapsed_string($dateVal);
+                                    $displayLine .= " <span class='text-brand-accent font-bold text-[9px] ml-1 px-1.5 py-0.5 bg-lime-100 rounded text-lime-700'>($ago)</span>";
+                                }
+                                echo "<span>" . $displayLine . "</span>";
+                            }
                         }
                         ?>
                     </div>
