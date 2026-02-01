@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="<?php echo htmlspecialchars($github_url); ?>" target="_blank" class="text-slate-500 hover:text-slate-800 transition">
                         <i class="fa-brands fa-github text-xl"></i>
                     </a>
-                    <a href="/" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 text-sm font-medium transition">
+                    <a href="noorgee.pk/Law" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 text-sm font-medium transition">
                         <i class="fa-solid fa-arrow-left mr-1"></i> Back to Site
                     </a>
                 </div>
@@ -280,4 +280,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
 </body>
+
 </html>
