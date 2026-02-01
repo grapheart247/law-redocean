@@ -5,6 +5,7 @@
  * Features: Deploy, Revert, Detailed Commit Info, Karachi Timezone.
  * Security: Password-based access ("123") with persistent sessions.
  * Fix: Post-Redirect-Get pattern to stop "Resubmit Form" popups.
+ * UI Update: In-place bubble confirmation next to buttons.
  */
 
 session_start();
@@ -26,7 +27,7 @@ $github_url = 'https://github.com/grapheart247/law-redocean';
 
 if (isset($_POST['login_pass']) && $_POST['login_pass'] === $access_pass) {
     $_SESSION['ro_authorized'] = true;
-    header("Location: deploy.php"); // Clean redirect after login
+    header("Location: deploy.php");
     exit;
 }
 
@@ -62,7 +63,7 @@ if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
 }
 
 // ==========================================
-// 3. ACTION LOGIC (PRG PATTERN)
+// 3. ACTION LOGIC
 // ==========================================
 
 function execute_command($cmd, $title) {
@@ -104,15 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Store logs in session and redirect to avoid form resubmission popup
     $_SESSION['last_logs'] = $temp_logs;
     header("Location: deploy.php");
     exit;
 }
 
-// Retrieve logs from session
 $logs = $_SESSION['last_logs'] ?? [];
-unset($_SESSION['last_logs']); // Clear after showing once
+unset($_SESSION['last_logs']);
 
 function get_commit_details($path) {
     $cmd = "git -C $path log -1 --format='Hash: %h%nAuthor: %an%nDate: %ci%nSubject: %s%nDescription: %b'";
@@ -139,60 +138,52 @@ $current_commit = get_commit_details($repo_path);
         .custom-scroll::-webkit-scrollbar-track { background: #0d1117; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
         
-        /* Bubble Message Animation */
-        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .bubble-msg { animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .bubble-msg { animation: slideInUp 0.3s ease-out forwards; }
+        
+        /* Tooltip Arrow */
+        .confirm-bubble::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex flex-col">
 
-    <!-- Notification Container -->
-    <div id="notification-area" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-    <!-- Confirmation Modal (Bubble Style) -->
-    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-sm w-full bubble-msg">
-            <div class="flex items-center gap-4 mb-4 text-orange-600">
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-slate-900" id="confirm-title">Are you sure?</h3>
-                    <p class="text-xs text-slate-500" id="confirm-desc">This will update live files.</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="closeConfirm()" class="flex-1 py-2 text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition">Cancel</button>
-                <button id="confirm-btn" class="flex-1 py-2 text-xs font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg transition">Yes, Proceed</button>
-            </div>
-        </div>
-    </div>
+    <!-- Notification Area (Top Right) -->
+    <div id="notification-area" class="fixed top-14 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- Header -->
     <nav class="bg-slate-900 text-white shadow-lg flex-none">
         <div class="max-w-7xl mx-auto px-4 h-12 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-server text-green-400 text-sm"></i>
-                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.3</span></h1>
+                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.4</span></h1>
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest hidden md:inline">Karachi: <?php echo date('H:i:s'); ?></span>
                 <button onclick="location.reload()" class="p-1.5 hover:bg-slate-800 rounded transition text-slate-400" title="Refresh Page">
                     <i class="fa-solid fa-rotate text-xs"></i>
                 </button>
-                <form method="POST" id="logout-form" class="inline">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="button" onclick="showBubbleConfirm('logout')" class="p-1.5 hover:text-red-400 transition text-slate-400" title="Logout & Exit">
-                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
-                    </button>
-                </form>
+                <div class="relative inline-block">
+                    <form method="POST" id="logout-form">
+                        <input type="hidden" name="action" value="logout">
+                        <button type="button" onclick="toggleConfirm(this, 'logout')" class="p-1.5 hover:text-red-400 transition text-slate-400" title="Logout & Exit">
+                            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 py-4 flex-1 flex flex-col gap-4 overflow-hidden w-full">
         
-        <!-- Top Row: Info & Controls -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 flex-none">
             
             <div class="md:col-span-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col overflow-hidden">
@@ -212,29 +203,49 @@ $current_commit = get_commit_details($repo_path);
                 </div>
             </div>
 
-            <div class="md:col-span-4 flex flex-col gap-2">
-                <div class="grid grid-cols-2 gap-2">
-                    <form method="POST" id="deploy-form">
-                        <input type="hidden" name="action" value="deploy">
-                        <button type="button" onclick="showBubbleConfirm('deploy')" class="w-full h-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            DEPLOY
-                        </button>
-                    </form>
-                    <form method="POST" id="revert-form">
-                        <input type="hidden" name="action" value="revert">
-                        <button type="button" onclick="showBubbleConfirm('revert')" class="w-full h-full py-2 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            REVERT
+            <div class="md:col-span-4 relative">
+                <!-- Action Buttons Container -->
+                <div class="flex flex-col gap-2 h-full">
+                    <div class="grid grid-cols-2 gap-2">
+                        <form method="POST" id="deploy-form" class="relative">
+                            <input type="hidden" name="action" value="deploy">
+                            <button type="button" onclick="toggleConfirm(this, 'deploy')" class="w-full h-full py-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> DEPLOY
+                            </button>
+                        </form>
+                        <form method="POST" id="revert-form" class="relative">
+                            <input type="hidden" name="action" value="revert">
+                            <button type="button" onclick="toggleConfirm(this, 'revert')" class="w-full h-full py-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
+                                <i class="fa-solid fa-clock-rotate-left"></i> REVERT
+                            </button>
+                        </form>
+                    </div>
+                    <form method="POST" id="status-form">
+                        <input type="hidden" name="action" value="status">
+                        <button type="submit" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded transition text-[10px] uppercase">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> System Status Check
                         </button>
                     </form>
                 </div>
-                <form method="POST" id="status-form">
-                    <input type="hidden" name="action" value="status">
-                    <button type="submit" class="w-full py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded transition text-[10px] uppercase">
-                        <i class="fa-solid fa-magnifying-glass mr-1"></i> System Status Check
-                    </button>
-                </form>
+
+                <!-- Shared Floating Confirm Bubble (Dynamic Position) -->
+                <div id="confirm-popover" class="hidden absolute z-[100] right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 bubble-msg confirm-bubble">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900" id="pop-title">Confirm?</h4>
+                                <p class="text-[10px] text-slate-500" id="pop-desc">Proceed with this action?</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 border-t border-slate-100 pt-3">
+                            <button onclick="hideConfirm()" class="flex-1 py-1.5 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 rounded transition">No, Cancel</button>
+                            <button id="pop-btn" class="flex-1 py-1.5 text-[10px] font-bold text-white bg-green-600 hover:bg-green-700 rounded transition">Yes, Run</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -278,64 +289,89 @@ $current_commit = get_commit_details($repo_path);
     </footer>
 
     <script>
-        // Custom Bubble Notification System
         function notify(msg, type = 'success') {
             const area = document.getElementById('notification-area');
             const bubble = document.createElement('div');
-            bubble.className = `bubble-msg pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${type === 'success' ? 'bg-green-600 border-green-500 text-white' : 'bg-red-600 border-red-500 text-white'} min-w-[240px]`;
+            bubble.className = `bubble-msg pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-lg shadow-xl border ${type === 'success' ? 'bg-green-600 border-green-500 text-white' : 'bg-red-600 border-red-500 text-white'} min-w-[200px]`;
             
-            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-            bubble.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="text-xs font-bold uppercase tracking-wide">${msg}</span>`;
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            bubble.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span class="text-[10px] font-bold uppercase tracking-wider">${msg}</span>`;
             
             area.appendChild(bubble);
 
-            // Remove after 10 seconds
             setTimeout(() => {
                 bubble.style.opacity = '0';
-                bubble.style.transform = 'translateY(20px)';
+                bubble.style.transform = 'translateY(-10px)';
                 bubble.style.transition = 'all 0.5s ease';
                 setTimeout(() => bubble.remove(), 500);
             }, 10000);
         }
 
-        // Custom Confirmation Logic
-        function showBubbleConfirm(action) {
-            const modal = document.getElementById('confirm-modal');
-            const btn = document.getElementById('confirm-btn');
-            const title = document.getElementById('confirm-title');
-            const desc = document.getElementById('confirm-desc');
+        // Toggle the confirm bubble next to the clicked button
+        function toggleConfirm(el, action) {
+            const popover = document.getElementById('confirm-popover');
+            const btn = document.getElementById('pop-btn');
+            const title = document.getElementById('pop-title');
+            const desc = document.getElementById('pop-desc');
 
+            // Setup content
             if (action === 'deploy') {
-                title.innerText = "Confirm Deployment";
-                desc.innerText = "Fetch latest code and update live site?";
+                title.innerText = "Deploy Changes?";
+                desc.innerText = "Fetch GitHub code & update Live site.";
+                btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-green-600 hover:bg-green-700 rounded transition";
                 btn.onclick = () => document.getElementById('deploy-form').submit();
             } else if (action === 'revert') {
-                title.innerText = "Confirm Revert";
-                desc.innerText = "This will delete current changes and go back 1 step.";
+                title.innerText = "Revert Site?";
+                desc.innerText = "Go back 1 commit. Current code will be lost.";
+                btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-red-600 hover:bg-red-700 rounded transition";
                 btn.onclick = () => document.getElementById('revert-form').submit();
             } else if (action === 'logout') {
-                title.innerText = "Logging Out";
-                desc.innerText = "Close deployment session and return to main site?";
+                title.innerText = "Exit Console?";
+                desc.innerText = "Close session & return to noorgee.pk";
+                btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-slate-800 hover:bg-black rounded transition";
                 btn.onclick = () => document.getElementById('logout-form').submit();
             }
 
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            // Reposition
+            const rect = el.getBoundingClientRect();
+            // If it's the logout button (navbar), align it differently
+            if(action === 'logout') {
+                popover.style.top = "45px";
+                popover.style.right = "10px";
+                popover.style.position = "fixed";
+            } else {
+                popover.style.top = "0px";
+                popover.style.right = "0px";
+                popover.style.position = "absolute";
+            }
+
+            popover.classList.remove('hidden');
         }
 
-        function closeConfirm() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+        function hideConfirm() {
+            document.getElementById('confirm-popover').classList.add('hidden');
         }
 
-        // Show result notification if logs exist (on page load after redirect)
+        // Hide confirm on clicking outside
+        document.addEventListener('click', function(event) {
+            const popover = document.getElementById('confirm-popover');
+            const forms = ['deploy-form', 'revert-form', 'logout-form'];
+            let clickedInside = popover.contains(event.target);
+            
+            forms.forEach(id => {
+                const f = document.getElementById(id);
+                if(f && f.contains(event.target)) clickedInside = true;
+            });
+
+            if (!clickedInside) hideConfirm();
+        });
+
         <?php if (!empty($logs)): ?>
             const allSuccess = <?php echo array_reduce($logs, fn($c, $l) => $c && $l['status'], true) ? 'true' : 'false'; ?>;
             if (allSuccess) {
-                notify("Operation completed successfully");
+                notify("Operation Successful");
             } else {
-                notify("Task finished with errors", "error");
+                notify("Errors Encountered", "error");
             }
         <?php endif; ?>
     </script>
