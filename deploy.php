@@ -48,7 +48,7 @@ if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
                     <i class="fa-solid fa-shield-halved text-green-400 text-2xl"></i>
                 </div>
                 <h2 class="text-white font-bold text-xl uppercase tracking-tight">RedOcean Login</h2>
-                <p class="text-slate-500 text-xs mt-1 italic">Enter '123' to manage Law Repo</p>
+                <p class="text-slate-500 text-xs mt-1 italic">Enter 'pass' to manage Law Repo</p>
             </div>
             <input type="password" name="login_pass" placeholder="Password" autofocus
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition text-center tracking-widest">
@@ -378,3 +378,4 @@ $current_commit = get_commit_details($repo_path);
 
 </body>
 </html>
+
