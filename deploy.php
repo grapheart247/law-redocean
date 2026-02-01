@@ -3,37 +3,72 @@
  * RedOcean Deployment Console (Compact Version)
  * ==========================================
  * Features: Deploy, Revert, Detailed Commit Info, Karachi Timezone.
+ * Security: Session-based access (No long URL required after first login).
  */
+
+session_start();
+date_default_timezone_set('Asia/Karachi');
 
 // ==========================================
 // 1. CONFIGURATION
 // ==========================================
 
-date_default_timezone_set('Asia/Karachi');
-
-// Full path to the repository (must contain .git folder)
-$repo_path = '/home/noorgeec/repositories/law-redocean';
-
-// Full path to the live public directory (where files should go)
-$work_tree = '/home/noorgeec/noorgee.pk/Law';
-
-// Target Git Branch
-$branch = 'main-lw';
-
-// Security Key (URL Parameter protection)
-$secret_key = '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';
-
-// GitHub Repository URL
+$repo_path  = '/home/noorgeec/repositories/law-redocean';
+$work_tree  = '/home/noorgeec/noorgee.pk/Law';
+$branch     = 'main-lw';
+$secret_key = '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'; // The Master Key
 $github_url = 'https://github.com/grapheart247/law-redocean';
 
 // ==========================================
-// 2. SECURITY & HELPER FUNCTIONS
+// 2. ACCESS CONTROL (Auto-Session)
 // ==========================================
 
-if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
-    header('HTTP/1.0 403 Forbidden');
-    die('<body style="background:#0f172a;color:#ef4444;font-family:monospace;display:flex;height:100vh;justify-content:center;align-items:center;"><h1>[ACCESS DENIED] INVALID SECURITY KEY</h1></body>');
+// If key is provided in URL, save to session and redirect to clean URL
+if (isset($_GET['key']) && $_GET['key'] === $secret_key) {
+    $_SESSION['ro_authorized'] = true;
+    header("Location: deploy.php");
+    exit;
 }
+
+// Handle Login Form Submission
+if (isset($_POST['login_key']) && $_POST['login_key'] === $secret_key) {
+    $_SESSION['ro_authorized'] = true;
+}
+
+// Check Authorization
+if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>RedOcean | Auth Required</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-[#0f172a] h-screen flex items-center justify-center p-4">
+        <form method="POST" class="bg-[#161b22] p-8 rounded-xl border border-slate-800 shadow-2xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-lock text-green-400 text-2xl"></i>
+                </div>
+                <h2 class="text-white font-bold text-xl">Deployment Auth</h2>
+                <p class="text-slate-500 text-sm">Enter security key to access console</p>
+            </div>
+            <input type="password" name="login_key" placeholder="Enter GHP Key..." autofocus
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition">
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition">
+                Authorize Access
+            </button>
+        </form>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
+// ==========================================
+// 3. ACTION LOGIC
+// ==========================================
 
 $action = isset($_POST['action']) ? $_POST['action'] : null;
 $logs = [];
@@ -57,14 +92,8 @@ function get_commit_details($path) {
     return $res ? htmlspecialchars($res) : "No commit data found.";
 }
 
-// ==========================================
-// 3. ACTION LOGIC
-// ==========================================
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (is_dir($repo_path)) {
-        chdir($repo_path);
-    }
+    if (is_dir($repo_path)) chdir($repo_path);
 
     if ($action === 'status') {
         $logs[] = execute_command("git status", "System Check");
@@ -79,6 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logs[] = execute_command("git reset --hard HEAD~1", "Rolling Back 1 Commit");
         $deploy_cmd = "git --git-dir=$repo_path/.git --work-tree=$work_tree checkout -f $branch";
         $logs[] = execute_command($deploy_cmd, "Restoring Previous Files to Live");
+    }
+    elseif ($action === 'logout') {
+        session_destroy();
+        header("Location: deploy.php");
+        exit;
     }
 }
 
@@ -98,7 +132,6 @@ $current_commit = get_commit_details($repo_path);
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .font-mono { font-family: 'JetBrains Mono', monospace; white-space: pre-wrap; }
         .terminal-bg { background: #0d1117; }
-        /* Custom scrollbar for terminal */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #0d1117; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
@@ -118,6 +151,12 @@ $current_commit = get_commit_details($repo_path);
                 <button onclick="location.reload()" class="p-1.5 hover:bg-slate-800 rounded transition text-slate-400" title="Refresh Page">
                     <i class="fa-solid fa-rotate text-xs"></i>
                 </button>
+                <form method="POST" class="inline">
+                    <input type="hidden" name="action" value="logout">
+                    <button type="submit" class="p-1.5 hover:text-red-400 transition text-slate-400" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
@@ -172,7 +211,7 @@ $current_commit = get_commit_details($repo_path);
             </div>
         </div>
 
-        <!-- Terminal Output (Reduced Height) -->
+        <!-- Terminal Output -->
         <div class="terminal-bg rounded-lg shadow-xl border border-slate-800 flex flex-col flex-1 min-h-0">
             <div class="bg-[#161b22] px-3 py-1.5 border-b border-slate-800 flex items-center justify-between">
                 <div class="flex gap-1">
@@ -204,13 +243,11 @@ $current_commit = get_commit_details($repo_path);
                 <?php endif; ?>
             </div>
         </div>
-
     </main>
 
-    <!-- Tiny Footer -->
     <footer class="bg-slate-100 border-t border-slate-200 px-4 py-1 flex justify-between items-center text-[9px] text-slate-400">
         <p>Repo: <?php echo $repo_path; ?></p>
-        <p>&copy; RedOcean Services - Secure Console</p>
+        <p>&copy; RedOcean Services - Session Active</p>
     </footer>
 
 </body>
