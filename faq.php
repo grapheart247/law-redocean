@@ -113,7 +113,7 @@ $faq_categories = [
     <nav class="fixed w-full z-50 glass-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <a href="index.php" class="flex-shrink-0 flex items-center gap-3">
+                <a href="index.html" class="flex-shrink-0 flex items-center gap-3">
                     <div class="w-10 h-10 bg-brand-dark text-brand-accent rounded-lg flex items-center justify-center text-xl font-bold">
                         <i class="fa-solid fa-scale-balanced"></i>
                     </div>
@@ -123,7 +123,7 @@ $faq_categories = [
                     </div>
                 </a>
                 <div class="flex items-center">
-                    <a href="index.php" class="text-slate-600 hover:text-brand-accent font-medium flex items-center gap-2 transition">
+                    <a href="index.html" class="text-slate-600 hover:text-brand-accent font-medium flex items-center gap-2 transition">
                         <i class="fa-solid fa-arrow-left"></i> Back to Home
                     </a>
                 </div>
@@ -186,7 +186,7 @@ $faq_categories = [
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-sm">&copy; <?php echo date('Y'); ?> NoorGee Enterprise. All rights reserved.</p>
             <div class="mt-4 flex justify-center gap-6 text-xs uppercase tracking-widest">
-                <a href="index.php" class="hover:text-white transition">Home</a>
+                <a href="index.html" class="hover:text-white transition">Home</a>
                 <a href="terms-and-conditions.html" class="hover:text-white transition">Terms</a>
                 <a href="faq.php" class="text-white font-bold">FAQ</a>
             </div>
