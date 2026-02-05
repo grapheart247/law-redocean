@@ -109,27 +109,7 @@ $faq_categories = [
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 glass-nav">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="index.html" class="flex-shrink-0 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-brand-dark text-brand-accent rounded-lg flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-scale-balanced"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-brand-dark tracking-tight leading-none">RedOcean</h1>
-                        <span class="text-xs text-brand-accent font-semibold tracking-wider uppercase">Legal & Tax Services</span>
-                    </div>
-                </a>
-                <div class="flex items-center">
-                    <a href="index.html" class="text-slate-600 hover:text-brand-accent font-medium flex items-center gap-2 transition">
-                        <i class="fa-solid fa-arrow-left"></i> Back to Home
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+ 
 
     <!-- Header Section -->
     <header class="pt-32 pb-12 bg-white border-b border-slate-200">
@@ -181,17 +161,7 @@ $faq_categories = [
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-brand-dark text-slate-400 py-12">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-sm">&copy; <?php echo date('Y'); ?> NoorGee Enterprise. All rights reserved.</p>
-            <div class="mt-4 flex justify-center gap-6 text-xs uppercase tracking-widest">
-                <a href="index.html" class="hover:text-white transition">Home</a>
-                <a href="terms-and-conditions.html" class="hover:text-white transition">Terms</a>
-                <a href="faq.php" class="text-white font-bold">FAQ</a>
-            </div>
-        </div>
-    </footer>
+  
 
 </body>
 </html>
