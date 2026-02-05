@@ -2,10 +2,10 @@
 /**
  * RedOcean Deployment Console (Compact Version)
  * ==========================================
- * Features: Deploy, Revert, Detailed Commit Info, Karachi Timezone.
+ * Features: Deploy, Revert Specific Commit, History Log, Karachi Timezone.
  * Security: Password-based access ("123") with persistent sessions.
  * Fix: Post-Redirect-Get pattern to stop "Resubmit Form" popups.
- * UI Update: In-place bubble confirmation next to buttons.
+ * UI Update: Added Commit Dropdown & Home Button.
  */
 
 session_start();
@@ -20,6 +20,7 @@ $work_tree  = '/home/noorgeec/noorgee.pk/Law';
 $branch     = 'main-lw';
 $access_pass = '123'; 
 $github_url = 'https://github.com/grapheart247/law-redocean';
+$home_url   = 'https://noorgee.pk/Law';
 
 // ==========================================
 // 2. ACCESS CONTROL
@@ -48,7 +49,7 @@ if (!isset($_SESSION['ro_authorized']) || $_SESSION['ro_authorized'] !== true) {
                     <i class="fa-solid fa-shield-halved text-green-400 text-2xl"></i>
                 </div>
                 <h2 class="text-white font-bold text-xl uppercase tracking-tight">RedOcean Login</h2>
-                <p class="text-slate-500 text-xs mt-1 italic">Enter 'pass' to manage Law Repo</p>
+                <p class="text-slate-500 text-xs mt-1 italic">Enter '123' to manage Law Repo</p>
             </div>
             <input type="password" name="login_pass" placeholder="Password" autofocus
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-green-500 outline-none transition text-center tracking-widest">
@@ -126,14 +127,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deploy_cmd = "git --git-dir=$repo_path/.git --work-tree=$work_tree checkout -f $branch";
         $temp_logs[] = execute_command($deploy_cmd, "Live Extraction");
     }
-    elseif ($action === 'revert') {
-        $temp_logs[] = execute_command("git reset --hard HEAD~1", "Rolling Back 1 Commit");
-        $deploy_cmd = "git --git-dir=$repo_path/.git --work-tree=$work_tree checkout -f $branch";
-        $temp_logs[] = execute_command($deploy_cmd, "Restoring Previous Files to Live");
+    elseif ($action === 'revert_specific') {
+        $target_hash = $_POST['commit_hash'] ?? '';
+        // Validate hash to be alphanumeric only for security
+        if ($target_hash && ctype_alnum($target_hash)) {
+            $temp_logs[] = execute_command("git reset --hard $target_hash", "Reverting to Commit: $target_hash");
+            $deploy_cmd = "git --git-dir=$repo_path/.git --work-tree=$work_tree checkout -f $branch";
+            $temp_logs[] = execute_command($deploy_cmd, "Restoring Live Files");
+        } else {
+            $temp_logs[] = ['title' => 'Error', 'command' => 'Validation', 'output' => 'Invalid or missing commit hash.', 'status' => false];
+        }
     }
     elseif ($action === 'logout') {
         session_destroy();
-        header("Location: https://noorgee.pk/Law");
+        header("Location: $home_url");
         exit;
     }
 
@@ -146,12 +153,30 @@ $logs = $_SESSION['last_logs'] ?? [];
 unset($_SESSION['last_logs']);
 
 function get_commit_details($path) {
-    $cmd = "git -C $path log -1 --format='Hash: %h%nAuthor: %an%nDate: %ci%nCommit message: %s%nExtended description: %b'";
+    $cmd = "git -C $path log -1 --format='Hash: %h%nAuthor: %an%nDate: %ci%nSubject: %s%nDescription: %b'";
     $res = @shell_exec($cmd);
     return $res ? htmlspecialchars($res) : "No commit data found.";
 }
 
+function get_commit_history($path) {
+    // Format: Hash | Date | Subject
+    $cmd = "git -C $path log -10 --format='%h|%ci|%s'";
+    $output = @shell_exec($cmd);
+    $history = [];
+    if ($output) {
+        $lines = explode("\n", trim($output));
+        foreach ($lines as $line) {
+            if (strpos($line, '|') !== false) {
+                list($hash, $date, $msg) = explode('|', $line, 3);
+                $history[] = ['hash' => $hash, 'date' => $date, 'msg' => $msg];
+            }
+        }
+    }
+    return $history;
+}
+
 $current_commit = get_commit_details($repo_path);
+$history_list = get_commit_history($repo_path);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -173,7 +198,6 @@ $current_commit = get_commit_details($repo_path);
         @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .bubble-msg { animation: slideInUp 0.3s ease-out forwards; }
         
-        /* Tooltip Arrow */
         .confirm-bubble::after {
             content: "";
             position: absolute;
@@ -195,11 +219,16 @@ $current_commit = get_commit_details($repo_path);
         <div class="max-w-7xl mx-auto px-4 h-12 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-server text-green-400 text-sm"></i>
-                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.4</span></h1>
+                <h1 class="font-bold text-sm tracking-tight uppercase">RedOcean Ops <span class="text-slate-500 font-normal">v2.5</span></h1>
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest hidden md:inline">Karachi: <?php echo date('H:i:s'); ?></span>
-                <button onclick="location.reload()" class="p-1.5 hover:bg-slate-800 rounded transition text-slate-400" title="Refresh Page">
+                
+                <a href="<?php echo $home_url; ?>" class="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white" title="Go Home">
+                    <i class="fa-solid fa-house text-xs"></i>
+                </a>
+
+                <button onclick="location.reload()" class="p-1.5 hover:bg-slate-800 rounded transition text-slate-400 hover:text-white" title="Refresh Page">
                     <i class="fa-solid fa-rotate text-xs"></i>
                 </button>
                 <div class="relative inline-block">
@@ -230,7 +259,6 @@ $current_commit = get_commit_details($repo_path);
                         foreach($lines as $line) {
                             if(trim($line)) {
                                 $displayLine = $line;
-                                // Add relative time to the Date line
                                 if (strpos($line, 'Date:') === 0) {
                                     $dateVal = trim(str_replace('Date:', '', $line));
                                     $ago = time_elapsed_string($dateVal);
@@ -247,24 +275,35 @@ $current_commit = get_commit_details($repo_path);
             <div class="md:col-span-4 relative">
                 <!-- Action Buttons Container -->
                 <div class="flex flex-col gap-2 h-full">
-                    <div class="grid grid-cols-2 gap-2">
-                        <form method="POST" id="deploy-form" class="relative">
-                            <input type="hidden" name="action" value="deploy">
-                            <button type="button" onclick="toggleConfirm(this, 'deploy')" class="w-full h-full py-3 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> DEPLOY
-                            </button>
-                        </form>
-                        <form method="POST" id="revert-form" class="relative">
-                            <input type="hidden" name="action" value="revert">
-                            <button type="button" onclick="toggleConfirm(this, 'revert')" class="w-full h-full py-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded transition flex flex-col items-center justify-center gap-1">
-                                <i class="fa-solid fa-clock-rotate-left"></i> REVERT
-                            </button>
-                        </form>
-                    </div>
+                    
+                    <!-- Deploy Button -->
+                    <form method="POST" id="deploy-form" class="relative">
+                        <input type="hidden" name="action" value="deploy">
+                        <button type="button" onclick="toggleConfirm(this, 'deploy')" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> DEPLOY LATEST
+                        </button>
+                    </form>
+
+                    <!-- Revert Dropdown Section -->
+                    <form method="POST" id="revert-form" class="relative flex gap-1">
+                        <input type="hidden" name="action" value="revert_specific">
+                        <select name="commit_hash" class="flex-1 text-[10px] bg-white border border-slate-300 rounded px-2 py-1.5 outline-none focus:border-red-400 text-slate-600 font-mono">
+                            <?php foreach ($history_list as $h): ?>
+                                <option value="<?php echo $h['hash']; ?>">
+                                    [<?php echo $h['hash']; ?>] <?php echo time_elapsed_string($h['date']); ?> - <?php echo substr($h['msg'], 0, 20); ?>...
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="button" onclick="toggleConfirm(this, 'revert')" class="px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded transition flex items-center justify-center" title="Revert to Selected">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </button>
+                    </form>
+
+                    <!-- Status Button -->
                     <form method="POST" id="status-form">
                         <input type="hidden" name="action" value="status">
-                        <button type="submit" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded transition text-[10px] uppercase">
-                            <i class="fa-solid fa-magnifying-glass mr-1"></i> System Status Check
+                        <button type="submit" class="w-full py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded transition text-[10px] uppercase">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> Check Status
                         </button>
                     </form>
                 </div>
@@ -282,7 +321,7 @@ $current_commit = get_commit_details($repo_path);
                             </div>
                         </div>
                         <div class="flex gap-2 border-t border-slate-100 pt-3">
-                            <button onclick="hideConfirm()" class="flex-1 py-1.5 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 rounded transition">No, Cancel</button>
+                            <button onclick="hideConfirm()" class="flex-1 py-1.5 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 rounded transition">Cancel</button>
                             <button id="pop-btn" class="flex-1 py-1.5 text-[10px] font-bold text-white bg-green-600 hover:bg-green-700 rounded transition">Yes, Run</button>
                         </div>
                     </div>
@@ -362,13 +401,15 @@ $current_commit = get_commit_details($repo_path);
                 btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-green-600 hover:bg-green-700 rounded transition";
                 btn.onclick = () => document.getElementById('deploy-form').submit();
             } else if (action === 'revert') {
-                title.innerText = "Revert Site?";
-                desc.innerText = "Go back 1 commit. Current code will be lost.";
+                const select = document.querySelector('select[name="commit_hash"]');
+                const selectedText = select.options[select.selectedIndex].text;
+                title.innerText = "Revert to Commit?";
+                desc.innerText = "Selected: " + selectedText.substring(0, 25) + "...";
                 btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-red-600 hover:bg-red-700 rounded transition";
                 btn.onclick = () => document.getElementById('revert-form').submit();
             } else if (action === 'logout') {
                 title.innerText = "Exit Console?";
-                desc.innerText = "Close session & return to noorgee.pk";
+                desc.innerText = "Close session & return to Site";
                 btn.className = "flex-1 py-1.5 text-[10px] font-bold text-white bg-slate-800 hover:bg-black rounded transition";
                 btn.onclick = () => document.getElementById('logout-form').submit();
             }
@@ -419,4 +460,3 @@ $current_commit = get_commit_details($repo_path);
 
 </body>
 </html>
-
