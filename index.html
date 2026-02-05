@@ -3,27 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RedOcean Services - Pakistan's Trusted Legal, Tax, and Digital Network. Expert services for NTN, Income Tax, SECP, NGO Registration, and Digital Solutions.">
-    <meta name="author" content="RedOcean Services">
+    <meta name="description" content="RedOcean Services - Pakistan's Trusted Legal, Tax, and Digital Network.">
     <title>RedOcean Services | Legal, Tax & Digital Consultants</title>
-
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome 6 (CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Config for Brand Colors -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            dark: '#0f172a',  /* Slate 900 */
-                            primary: '#334155', /* Slate 700 */
-                            accent: '#65a30d', /* Lime 600 */
-                            light: '#f1f5f9', /* Slate 100 */
+                            dark: '#0f172a',
+                            primary: '#334155',
+                            accent: '#65a30d',
+                            light: '#f1f5f9',
                         }
                     },
                     fontFamily: {
@@ -33,34 +26,12 @@
             }
         }
     </script>
-
-    <!-- Custom Styles & Animations -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        
         body { font-family: 'Inter', sans-serif; }
-        
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-accent selection:text-white">
@@ -69,7 +40,6 @@
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
                     <div class="w-10 h-10 bg-brand-dark text-brand-accent rounded-lg flex items-center justify-center text-xl font-bold">
                         <i class="fa-solid fa-scale-balanced"></i>
@@ -79,8 +49,6 @@
                         <span class="text-xs text-brand-accent font-semibold tracking-wider uppercase">Legal & Tax Services</span>
                     </div>
                 </div>
-
-                <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-6 items-center">
                     <a href="#home" class="text-slate-600 hover:text-brand-accent font-medium transition">Home</a>
                     <a href="#services" class="text-slate-600 hover:text-brand-accent font-medium transition">Services</a>
@@ -88,30 +56,19 @@
                     <a href="terms-and-conditions.html" class="text-slate-600 hover:text-brand-accent font-medium transition">Terms</a>
                     <a href="faq.php" class="text-slate-600 hover:text-brand-accent font-medium transition">FAQ</a>
                     <a href="help.html" class="text-slate-600 hover:text-brand-accent font-medium transition">Help</a>
-                    <a href="send_message.php" class="px-5 py-2.5 bg-brand-dark text-white rounded-full hover:bg-brand-accent transition shadow-lg transform hover:-translate-y-0.5">
-                        Contact
-                    </a>
+                    <a href="#contact" class="px-5 py-2.5 bg-brand-dark text-white rounded-full hover:bg-brand-accent transition shadow-lg transform hover:-translate-y-0.5">Contact</a>
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-dark">
-                        <i class="fa-solid fa-bars text-2xl"></i>
-                    </button>
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-dark"><i class="fa-solid fa-bars text-2xl"></i></button>
                 </div>
             </div>
         </div>
-
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full shadow-xl">
             <div class="px-4 pt-2 pb-6 space-y-2">
                 <a href="#home" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">Home</a>
                 <a href="#services" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">Services</a>
                 <a href="#team" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">Experts</a>
-                <a href="terms-and-conditions.html" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">Terms</a>
-                <a href="faq.php" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">FAQ</a>
-                <a href="help.html" class="block px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-md">Help</a>
-                <a href="send_message.php" class="block px-3 py-2 text-base font-medium text-brand-accent font-bold">Contact Us</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-brand-accent font-bold">Contact Us</a>
             </div>
         </div>
     </nav>
@@ -147,7 +104,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                
                 <!-- Member 1: Faisal -->
                 <div class="bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition reveal border border-slate-100">
                     <img src="https://www.noorgee.pk/Web/img/FSL-ng.jpg" alt="Faisal Shahab" class="w-full h-56 object-cover object-top">
@@ -157,7 +113,6 @@
                         <p class="text-[11px] text-slate-500 leading-relaxed">FBR Taxation, Corporate Laws and Strategy.</p>
                     </div>
                 </div>
-
                 <!-- Member 2: Noor -->
                 <div class="bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition reveal delay-75 border border-slate-100">
                     <img src="https://noorgee.pk/Dev/img/uae-NG-noor-Red.png" alt="Noordin" class="w-full h-56 object-cover object-top">
@@ -167,7 +122,6 @@
                         <p class="text-[11px] text-slate-500 leading-relaxed">Client relations and operational workflows.</p>
                     </div>
                 </div>
-
                  <!-- Member 3: Athar -->
                  <div class="bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition reveal delay-150 border border-slate-100">
                     <img src="https://noorgee.pk/Dev/img/athar-photo.png" alt="Athar Hussain" class="w-full h-56 object-cover object-top">
@@ -177,27 +131,87 @@
                         <p class="text-[11px] text-slate-500 leading-relaxed">Expert in financial planning, audits, and corporate accounts.</p>
                     </div>
                 </div>
-
                 <!-- Member 4: Farooq Mirza -->
                 <div class="bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition reveal delay-225 border border-slate-100">
-                    <img src="faroqmrz.jpg" alt="Farooq Mirza" class="w-full h-56 object-cover object-top">
+                    <!-- UPDATED IMAGE PATH -->
+                    <img src="/asset/faroqmrz.jpg" onerror="this.src='https://placehold.co/400x500?text=Farooq+Mirza'" alt="Farooq Mirza" class="w-full h-56 object-cover object-top">
                     <div class="p-5">
                         <h4 class="text-base font-bold text-brand-dark">Farooq Mirza</h4>
                         <p class="text-xs text-brand-accent font-semibold mb-2">Electricity Legal Expert</p>
                         <p class="text-[11px] text-slate-500 leading-relaxed">Specialist in Utilities (Electrical & Gas) litigation and corporate service.</p>
                     </div>
                 </div>
-
                 <!-- Member 5: Ali Gohar -->
                 <div class="bg-slate-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition reveal delay-300 border border-slate-100">
-                    <img src="gohar.jpg" alt="Ali Gohar" class="w-full h-56 object-cover object-top">
+                    <!-- UPDATED IMAGE PATH -->
+                    <img src="/asset/gohar.jpg" onerror="this.src='https://placehold.co/400x500?text=Ali+Gohar'" alt="Ali Gohar" class="w-full h-56 object-cover object-top">
                     <div class="p-5">
                         <h4 class="text-base font-bold text-brand-dark">Ali Gohar</h4>
                         <p class="text-xs text-brand-accent font-semibold mb-2">Lawyer & Legal Expert</p>
                         <p class="text-[11px] text-slate-500 leading-relaxed">Handling Criminal & Property issues with deep consultancy</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-brand-dark relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-accent/20 rounded-full blur-3xl"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden reveal">
+                <div class="grid grid-cols-1 md:grid-cols-5">
+                    <div class="bg-slate-100 p-8 md:col-span-2 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-brand-dark mb-6">Contact Info</h3>
+                            <ul class="space-y-6">
+                                <li class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-brand-accent text-white flex items-center justify-center flex-shrink-0 mt-1"><i class="fa-solid fa-phone text-xs"></i></div>
+                                    <div><p class="text-xs text-slate-500 font-bold uppercase">Call Us</p><p class="text-sm text-brand-dark font-medium">0321-2488101</p></div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-brand-accent text-white flex items-center justify-center flex-shrink-0 mt-1"><i class="fa-solid fa-envelope text-xs"></i></div>
+                                    <div><p class="text-xs text-slate-500 font-bold uppercase">Email Us</p><p class="text-sm text-brand-dark font-medium break-all">admin@noorgee.pk</p></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="p-8 md:col-span-3">
+                        <h3 class="text-2xl font-bold text-brand-dark mb-2">Get Free Consultation</h3>
+                        <p class="text-slate-500 text-sm mb-6">Fill the form below and our expert will contact you shortly.</p>
+                        
+                        <!-- AJAX Form -->
+                        <form id="contactForm" class="space-y-4">
+                            <input type="hidden" name="site_source" value="lw.noorgee.pk">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Full Name</label>
+                                <input type="text" name="name" required class="w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none text-sm">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Email Address</label>
+                                    <input type="email" name="email" required class="w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Phone</label>
+                                    <input type="tel" name="phone" class="w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Subject</label>
+                                <input type="text" name="subject" required class="w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none text-sm" placeholder="e.g. Tax Filing">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Message</label>
+                                <textarea name="message" rows="3" required class="w-full px-4 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-brand-accent focus:ring-1 focus:ring-brand-accent outline-none text-sm"></textarea>
+                            </div>
+                            <div id="formStatus" class="hidden text-sm p-3 rounded-lg text-center"></div>
+                            <button type="submit" id="submitBtn" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg hover:bg-brand-accent transition shadow-lg flex justify-center items-center gap-2">
+                                <span>Send Message</span><i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -206,7 +220,6 @@
     <footer class="bg-brand-dark text-slate-400 py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <!-- Column 1: Sister Concerns -->
                 <div>
                     <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest border-l-4 border-brand-accent pl-3">Sister Concerns</h4>
                     <ul class="space-y-3 text-sm">
@@ -216,36 +229,24 @@
                         <li><a href="http://kwa.com.pk" target="_blank" class="hover:text-brand-accent transition">Karsazian Welfare Association</a></li>
                     </ul>
                 </div>
-
-                <!-- Column 2: Social Media -->
                 <div>
                     <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest border-l-4 border-brand-accent pl-3">Connect With Us</h4>
                     <div class="flex space-x-5 text-xl">
-                        <a href="#" class="hover:text-white transition" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="#" class="hover:text-white transition" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="hover:text-white transition" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-                        <a href="#" class="hover:text-brand-accent transition" title="WhatsApp Channel"><i class="fa-brands fa-whatsapp"></i></a>
-                    </div>
-                    <div class="mt-6">
-                        <p class="text-xs leading-relaxed italic">Stay updated with the latest tax laws and legal updates through our social channels.</p>
+                        <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-brand-accent transition"><i class="fa-brands fa-whatsapp"></i></a>
                     </div>
                 </div>
-
-                <!-- Column 3: Copyright & Deployment -->
                 <div class="md:text-right">
                     <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest md:border-r-4 md:border-l-0 border-l-4 border-brand-accent md:pr-3 pl-3 md:pl-0">Administrative</h4>
-                    <p class="text-sm mb-4">&copy; <?php echo date("Y"); ?> NoorGee Enterprise. All rights reserved.</p>
+                    <p class="text-sm mb-4">&copy; <?php echo date("Y"); ?> NoorGee Enterprise.</p>
                     <div class="flex justify-start md:justify-end gap-2 flex-wrap">
-                         <a href="https://noorgee.pk" class="text-[10px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded hover:bg-slate-700 transition flex items-center gap-1 border border-slate-700">
-                            <i class="fa-solid fa-house"></i> Main Page
-                        </a>
-                        <a href="https://noorgee.pk/Law/deploy.php" class="text-[10px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded hover:bg-slate-700 transition flex items-center gap-1 border border-slate-700">
-                            <i class="fa-brands fa-git-alt"></i> GIT DEPLOY
-                        </a>
+                         <a href="https://noorgee.pk" class="text-[10px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded hover:bg-slate-700 transition flex items-center gap-1 border border-slate-700"><i class="fa-solid fa-house"></i> Main Page</a>
+                        <a href="https://noorgee.pk/Law/deploy.php" class="text-[10px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded hover:bg-slate-700 transition flex items-center gap-1 border border-slate-700"><i class="fa-brands fa-git-alt"></i> GIT DEPLOY</a>
                     </div>
                 </div>
             </div>
-            
             <div class="mt-12 pt-8 border-t border-slate-800 text-[11px] flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
                 <p>RedOcean Services Pvt. Ltd. | NTN & SECP Registered Consultant</p>
                 <div class="flex gap-6 uppercase tracking-tighter">
@@ -258,25 +259,18 @@
     </footer>
 
     <script>
-        // Scroll Reveal
         window.addEventListener('scroll', reveal);
         function reveal() {
             var reveals = document.querySelectorAll('.reveal');
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
-                if (elementTop < windowHeight - 100) {
-                    reveals[i].classList.add('active');
-                }
+                if (elementTop < windowHeight - 100) reveals[i].classList.add('active');
             }
         }
         reveal();
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
 
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
-        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
-
-        // Contact Form AJAX
         document.getElementById('contactForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -296,7 +290,6 @@
                 status.classList.add(data.status === 'success' ? 'bg-green-100' : 'bg-red-100', data.status === 'success' ? 'text-green-700' : 'text-red-700');
                 status.innerText = data.message;
                 status.classList.remove('hidden');
-                
                 if(data.status === 'success') this.reset();
             })
             .catch(err => {
